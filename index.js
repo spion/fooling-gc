@@ -24,14 +24,7 @@ function source() {
 
 function processor() {
   var storage = []
-
-  var usages = [];
-
-  function criteria(o1, o2) {
-    return o1.number < o2.number ? -1
-         : o1.number > o2.number ?  1
-         : 0
-  }
+  var usages  = [];
 
   return through(function(data, enc, done) {
     var res = JSON.parse(data)
