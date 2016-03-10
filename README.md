@@ -9,10 +9,10 @@ Run
 
 to compare.
 
-My current best attempt to fool the GC is:
+Current best attempt to fool the GC is:
 
-       with forced GC : 51.8 MB
-    with automatic GC : 67.9 MB
-             increase : 16.1 MB (31.1 %)
-
-
+```
+    with forced GC : 33.1 MB
+with automatic GC : 67.3 MB
+            increase : 34.2 MB, 103.3 %
+```

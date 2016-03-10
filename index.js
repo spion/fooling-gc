@@ -26,14 +26,21 @@ function processor() {
   var storage = []
   var usages  = [];
 
+  var gcCounter = 0;
+
   return through(function(data, enc, done) {
     var res = JSON.parse(data)
     storage.push(res)
+
+    if (++gcCounter % 100 === 0 && global.gc) global.gc()
+
     if (storage.length > maxStorageSize) {
       //storage.sort(criteria)
       this.push(JSON.stringify(storage) + '\n')
       storage = []
-      if (global.gc) global.gc();
+
+      if (global.gc) global.gc()
+
       var memUse = process.memoryUsage().rss / 1024 / 1024;
       usages.push(memUse);
       console.log("Repetition %s of %s : %s MB", usages.length, repetitions, memUse.toFixed(1))
