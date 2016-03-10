@@ -43,10 +43,10 @@ function processor() {
       if (global.gc) global.gc();
       var memUse = process.memoryUsage().rss / 1024 / 1024;
       usages.push(memUse);
-      console.log("Repetition", usages.length, "of", repetitions, ":", memUse.toFixed(1), "MB")
+      console.log("Repetition %s of %s : %s MB", usages.length, repetitions, memUse.toFixed(1))
       if (usages.length >= repetitions) {
         console.log("=========================")
-	    console.log("Peak memory usage", Math.max.apply(Math, usages).toFixed(1), "MB")
+	    console.log("Peak memory usage: %s MB", Math.max.apply(Math, usages).toFixed(1))
         console.log("=========================")
         process.exit(0)
       }
@@ -62,16 +62,25 @@ function run() {
     .on('data', function(){})
 }
 
+function execExtract(str, cb) {
+    var p = exec(str)
+    p.stdout.pipe(process.stdout)
+    p.stdout.pipe(split()).pipe(through(function(data, enc, done) {
+        if (!/^Peak memory usage/.test(data)) return done()
+        var megabytes = data.toString().split(' ')[3]
+        cb(null, megabytes)
+    }))
+}
+
 if (!argv.run) {
     console.log("With forced GC")
-    var p = exec(process.argv[0] + " --expose-gc ./index.js --run")
-    p.stdout.pipe(process.stdout)
-    p.on('exit', function() {
+    execExtract(process.argv[0] + " --expose-gc ./index.js --run", function(err, forcedMB) {
         console.log("With automatic GC")
-        p = exec(process.argv[0] + " index.js --run")
-        p.stdout.pipe(process.stdout)
+        execExtract(process.argv[0] + " index.js --run", function(err, automaticMB) {
+            var increase = automaticMB - forcedMB;
+            console.log("Increase: %s MB, %s %", increase.toFixed(1), (100 * increase / forcedMB).toFixed(1));
+        })
     })
-
 } else {
     run()
 }
