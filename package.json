@@ -1,0 +1,17 @@
+{
+  "name": "fooling-gc",
+  "version": "1.0.0",
+  "description": "Fooling the V8 garbage collector",
+  "main": "index.js",
+  "dependencies": {
+    "split2": "^2.0.1",
+    "through2": "^2.0.1",
+    "yargs": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "spion",
+  "license": "ISC"
+}
