@@ -2,6 +2,7 @@ var argv = require('yargs').argv
 var through = require('through2')
 var split = require('split2')
 var process = require('process')
+var exec = require('child_process').exec
 
 var maxStorageSize = argv['storageSize'] || 10000
 var repetitions    = argv['repetitions'] || 30
@@ -54,7 +55,23 @@ function processor() {
   })
 }
 
-source()
-.pipe(split())
-.pipe(processor())
-.on('data', function(){})
+function run() {
+    source()
+    .pipe(split())
+    .pipe(processor())
+    .on('data', function(){})
+}
+
+if (!argv.run) {
+    console.log("With forced GC")
+    var p = exec(process.argv[0] + " --expose-gc ./index.js --run")
+    p.stdout.pipe(process.stdout)
+    p.on('exit', function() {
+        console.log("With automatic GC")
+        p = exec(process.argv[0] + " index.js --run")
+        p.stdout.pipe(process.stdout)
+    })
+
+} else {
+    run()
+}
